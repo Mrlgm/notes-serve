@@ -1,11 +1,11 @@
 const router = require('koa-router')()
 
 
-router.get('/', async (ctx, next) => {
-  ctx.body = "<div>Hello</div>"
-})
-
-
+router.post('/',async (ctx)=>{
+  // console.log(ctx.request.files);
+  console.log(ctx.uploadpath);
+  ctx.body = 'http://api.wwnight.cn/' + ctx.uploadpath.file
+});
 
 // module.exports = router
 module.exports = router

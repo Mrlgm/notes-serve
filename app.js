@@ -5,12 +5,15 @@ const router = require('koa-router')()
 const koaBody = require('koa-body')
 const bodyParser = require('koa-bodyparser')
 const session = require('koa-session-minimal');
+const static = require('koa-static')
 const MongooseStore = require('koa-session-mongoose');
 const config = require('./config/default')
+const path = require('path')
 
 const notes = require('./routes/notes')
 const auth = require('./routes/auth')
 const index = require('./routes/index')
+const upload = require('./utils/upload')
 
 const app = new Koa()
 
@@ -27,6 +30,44 @@ app.use(cors({
 app.use(session({
   key: config.session.key,
   // store: new MongooseStore()
+}))
+
+// koaBody({
+//   multipart: true,
+//   formidable: {
+//       maxFileSize: 200*1024*1024    // 设置上传文件大小最大限制，默认2M
+//   }
+// })
+
+const staticPath = './public'
+
+app.use(static(path.join( __dirname,  staticPath)))
+
+app.use(koaBody({
+  multipart:true,
+  encoding:'gzip',
+  formidable:{
+    uploadDir:path.join(__dirname,'public/img'),
+    keepExtensions: true,
+    maxFieldsSize:200 * 1024 * 1024,
+    onFileBegin:(name,file) => {
+      // console.log(file);
+      // 获取文件后缀
+      const ext = upload.getUploadFileExt(file.name);
+      // 最终要保存到的文件夹目录
+      const dir = path.join(__dirname,'public/img');
+
+      const fileName = upload.getUploadFileName(ext)
+      // 重新覆盖 file.path 属性
+      file.path = `${dir}/${fileName}`;
+      
+      app.context.uploadpath = app.context.uploadpath ? app.context.uploadpath : {};
+      app.context.uploadpath[name] = `img/${fileName}`;
+    },
+    onError:(err)=>{
+      console.log(err);
+    }
+  }
 }))
 
 // router.get('/', async (ctx, next) => {

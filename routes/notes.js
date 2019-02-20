@@ -30,8 +30,9 @@ router.post('/add', koaBody(), async (ctx, next) => {
   }
   let {grade,content} = ctx.request.body
   let username = ctx.session.user.username
+  let createAt = new Date()
   console.log({content: content, username: username})
-  let note = await Note.create({username,content,grade})
+  let note = await Note.create({username,content,grade,createAt})
   if(note){
     ctx.body = {status: 0, msg:'创建成功'}
   }

@@ -17,6 +17,7 @@
     "koa-router": "^7.4.0",
     "koa-session-minimal": "^3.0.4",
     "koa-session-mongoose": "^2.0.5",
+    "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "moment": "^2.24.0",
     "mongolass": "^4.4.2",
