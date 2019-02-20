@@ -4,7 +4,6 @@ const User = require('../lib/mongo').User
 
 router.post('/register', koaBody(), async (ctx) => {
   // 待写入数据库的用户信息
-
   let {username,password,avatar} = ctx.request.body
   console.log(ctx.request.body)
   let user = await User.findOne({
@@ -40,7 +39,7 @@ router.get('/', async (ctx, next) => {
 
 // 注销登录
 router.get('/logout', async (ctx, next) => {
-  if(req.session.user){
+  if(ctx.session.user){
     ctx.session.user = null
     ctx.body = {status:'ok',msg: '注销成功'}
   }else {
@@ -50,10 +49,10 @@ router.get('/logout', async (ctx, next) => {
 
 // 用户登陆
 router.post('/login', koaBody(), async (ctx) => {
-  let {
-    username,
-    password
-  } = ctx.request.body
+
+  let  username= ctx.request.body.username
+  let password = ctx.request.body.password
+  
   console.log(ctx.request.body)
   let user = await User.findOne({
     username

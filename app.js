@@ -2,7 +2,7 @@ const Koa = require('koa')
 const mongoose = require('mongoose')
 const cors = require('koa2-cors')
 const router = require('koa-router')()
-const koaBody = require('koa-body') 
+const koaBody = require('koa-body')
 const bodyParser = require('koa-bodyparser')
 const session = require('koa-session-minimal');
 const MongooseStore = require('koa-session-mongoose');
@@ -25,8 +25,8 @@ app.use(cors({
 }));
 
 app.use(session({
-  key:config.session.key,
-  store: new MongooseStore()
+  key: config.session.key,
+  // store: new MongooseStore()
 }))
 
 // router.get('/', async (ctx, next) => {
