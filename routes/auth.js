@@ -3,6 +3,7 @@ const koaBody = require('koa-body')
 const fs = require('fs')
 const path = require('path')
 const User = require('../lib/mongo').User
+const sha1 = require('sha1')
 
 // router.post('/uploadfile',koaBody({
 //   multipart: true,
@@ -33,15 +34,20 @@ router.post('/register', koaBody(), async (ctx) => {
   if(user){
     ctx.body={status:'fail', msg: '用户已存在'}
   }else{
+
+    password = sha1(password)
+
     let result = await User.create({
       username,
       password,
       avatar
     })
-    // // 删除密码这种敏感信息，将用户信息存入 session
-    // delete user.password
+    
+    
     console.log(result)
-    let json = result.ops[0]
+    let json = JSON.parse(JSON.stringify(result))
+    // 删除密码这种敏感信息，将用户信息存入 session
+    delete json.password
     ctx.session.user = json
     ctx.body={status:'ok',msg: '创建成功', data: json}
   }
@@ -80,11 +86,14 @@ router.post('/login', koaBody(), async (ctx) => {
   if(!user){
     return ctx.body = {status:'fail',msg:'用户不存在'}
   }
-  if(password!==user.password){
+  if(sha1(password) !== user.password){
     return ctx.body = {status:'fail',msg:'用户名或密码错误'}
   }
-  ctx.session.user = user
-  ctx.body = {status:'ok',msg: '登录成功', data: user}
+  // 用户信息写入 session
+  let json = JSON.parse(JSON.stringify(user))
+  delete json.password
+  ctx.session.user = json
+  ctx.body = {status:'ok',msg: '登录成功', data: json}
 })
 
 // router.get('/login', async (ctx) => {
