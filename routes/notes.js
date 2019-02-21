@@ -25,16 +25,26 @@ router.post('/add', koaBody(), async (ctx, next) => {
       errorMsg: '请先登录'
     }
   }
+
   if (!ctx.request.body.content) {
     return ctx.body = {status: 2, errorMsg: '内容不能为空'}
   }
+
   let {grade,content} = ctx.request.body
+  if(grade === undefined){
+    grade = 0
+  }
+  grade = parseInt(grade)
+  if(isNaN(grade)){
+    return ctx.body = {status: 4, errorMsg: '请输入正确的数据格式'}
+  }
+
   let username = ctx.session.user.username
   let createAt = new Date()
   console.log({content: content, username: username})
   let note = await Note.create({username,content,grade,createAt})
   if(note){
-    ctx.body = {status: 0, msg:'创建成功'}
+    ctx.body = {status: 0, msg:'创建成功', data:note}
   }
 })
 
@@ -51,13 +61,14 @@ router.post('/edit', koaBody(), async (ctx) => {
   let newData = {content,complete,grade}
   let result = await Note.findOneAndUpdate(query, newData, {upsert:true});
   if(result){
+    result.__v+=1
+    result.save()
     ctx.body = {
       status: 0,
-      msg: '修改成功'      
+      msg: '修改成功',
+      data: result      
     }
   }
-  result.__v+=1
-  result.save()
 })
 
 router.post('/delete', koaBody(), async (ctx) => {

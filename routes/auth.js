@@ -36,11 +36,14 @@ router.post('/register', koaBody(), async (ctx) => {
   }else{
 
     password = sha1(password)
+    
+    let createAt = new Date()
 
     let result = await User.create({
       username,
       password,
-      avatar
+      avatar,
+      createAt
     })
     
     
